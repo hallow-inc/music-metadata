@@ -206,16 +206,22 @@ export class WaveParser extends BasicParser {
       const valueToken = new riff.ListInfoTagValue(header);
       const value = await this.tokenizer.readToken(valueToken);
       if (header.chunkID === 'labl') {
-        for (let c = 0; c < this.metadata.cues.length; c++) {
-          const n = this.metadata.cues[c].dwName;
-          const regex = new RegExp('^\\x0' + n);
-          if (regex.test(value)) {
-            this.metadata.cues[c].label = util.stripNulls(value.replace(regex, ''));
-            break;
-          }
-        }
+        this.setCueData('label', value);
+      } else if (header.chunkID === 'note') {
+        this.setCueData('description', value);
       }
       chunkSize -= (8 + valueToken.len);
+    }
+  }
+
+  private setCueData(name, value) {
+    for (let c = 0; c < this.metadata.cues.length; c++) {
+      const n = this.metadata.cues[c].dwName;
+      const regex = new RegExp('^\\x0' + n);
+      if (regex.test(value)) {
+        this.metadata.cues[c][name] = util.stripNulls(value.replace(regex, ''));
+        break;
+      }
     }
   }
 

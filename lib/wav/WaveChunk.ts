@@ -109,6 +109,7 @@ export interface IPoint {
    * Cue point name
    */
   label?: string,
+  description?: string,
   /**
    * Start position in milliseconds
    */

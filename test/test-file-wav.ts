@@ -246,7 +246,8 @@ describe('Parse RIFF/WAVE audio format', () => {
         dwBlockStart: 0,
         dwSampleOffset: 441000,
         position: 10000,
-        label: 'test_end'
+        label: 'test_end',
+        description: 'with description'
       }
     ]);
   });
