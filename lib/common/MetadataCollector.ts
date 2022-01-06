@@ -11,6 +11,8 @@ import { CombinedTagMapper } from './CombinedTagMapper.js';
 import { CommonTagMapper } from './GenericTagMapper.js';
 import { toRatio } from './Util.js';
 import { fileTypeFromBuffer } from 'file-type';
+import * as FileType from 'file-type/core';
+import { IPoint } from "../wav/WaveChunk";
 
 const debug = initDebug('music-metadata:collector');
 
@@ -40,6 +42,8 @@ export interface INativeMetadataCollector extends IWarningCollector {
 
   readonly quality: IQualityInformation;
 
+  readonly cues?: IPoint[];
+
   /**
    * @returns {boolean} true if one or more tags have been found
    */
@@ -50,6 +54,8 @@ export interface INativeMetadataCollector extends IWarningCollector {
   addTag(tagType: TagType, tagId: string, value: any): void;
 
   addStreamInfo(streamInfo: ITrackInfo): void;
+
+  addCuePoint(cuePoint: IPoint): void;
 }
 
 /**
@@ -90,6 +96,7 @@ export class MetadataCollector implements INativeMetadataCollector {
   } = {};
 
   private tagMapper = new CombinedTagMapper();
+  public readonly cues?: IPoint[] = [];
 
   public constructor(private opts: IOptions) {
     let priority: number = 1;
@@ -130,6 +137,10 @@ export class MetadataCollector implements INativeMetadataCollector {
     this.native[tagType].push({id: tagId, value});
 
     this.toCommon(tagType, tagId, value);
+  }
+
+  public addCuePoint(cuePoint: IPoint) {
+    this.cues.push(cuePoint);
   }
 
   public addWarning(warning: string) {
@@ -270,7 +281,8 @@ export class MetadataCollector implements INativeMetadataCollector {
       format: this.format,
       native: this.native,
       quality: this.quality,
-      common: this.common
+      common: this.common,
+      cues: this.cues
     };
   }
 

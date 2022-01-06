@@ -108,7 +108,7 @@ describe('Parse RIFF/WAVE audio format', () => {
     assert.deepEqual(common.media, 'CD');
   });
 
-  it('should handle be able to handle odd chunk & padding', async () => {
+  it('should be able to handle odd chunk & padding', async () => {
 
     const filePath = path.join(samplePath, 'issue-161.wav');
 
@@ -173,7 +173,7 @@ describe('Parse RIFF/WAVE audio format', () => {
   });
 
   // https://github.com/Borewit/music-metadata/issues/819
-  it('Duration despite wrong chunk size', async () => {
+  it('should get duration despite wrong chunk size', async () => {
     const filePath = path.join(wavSamples, 'issue-819.wav');
 
     const {format} = await mm.parseFile(filePath);
@@ -189,17 +189,66 @@ describe('Parse RIFF/WAVE audio format', () => {
   it('Support chunk size larger then BWF extension', async () => {
     // const filePath = path.join(wavSamples, 'unreadable-tags.wav');
     const filePath = path.join(wavSamples, 'issue-1163.bwf');
-    const {format, common, native} = await mm.parseFile(filePath);
-
+    const { format, common, native } = await mm.parseFile(filePath);
+  
     assert.strictEqual(format.container, 'WAVE', 'format.container');
     assert.strictEqual(format.codec, 'PCM', 'format.codec');
-
+  
     assert.strictEqual(common.artist, 'Some Composer', 'common.artists');
     assert.strictEqual(common.title, 'Title Redacted', 'common.title');
-    assert.deepStrictEqual(common.track, {no: 1, of: 12}, 'common.track');
-
+    assert.deepStrictEqual(common.track, { no: 1, of: 12 }, 'common.track');
+  
     const exif = mm.orderTags(native.exif);
     assert.deepStrictEqual(exif['bext.originator'], ['Pro Tools'], 'BWF: exif.bext.originator');
+  })
+  
+  it('should handle cue points', async () => {
+    const filePath = path.join(wavSamples, 'cue-points.wav');
+
+    const { cues } = await mm.parseFile(filePath);
+
+    assert.deepEqual(cues, [
+      {
+        dwName: 0,
+        dwPosition: 0,
+        fccChunk: 1635017060,
+        dwChunkStart: 0,
+        dwBlockStart: 0,
+        dwSampleOffset: 0,
+        position: 0,
+        label: '00:00:00.00000'
+      },
+      {
+        dwName: 1,
+        dwPosition: 174607,
+        fccChunk: 1635017060,
+        dwChunkStart: 0,
+        dwBlockStart: 0,
+        dwSampleOffset: 174607,
+        position: 3959.342403628118,
+        label: 'test_point_1'
+      },
+      {
+        dwName: 2,
+        dwPosition: 367069,
+        fccChunk: 1635017060,
+        dwChunkStart: 0,
+        dwBlockStart: 0,
+        dwSampleOffset: 367069,
+        position: 8323.560090702947,
+        label: 'test_point_2'
+      },
+      {
+        dwName: 3,
+        dwPosition: 441000,
+        fccChunk: 1635017060,
+        dwChunkStart: 0,
+        dwBlockStart: 0,
+        dwSampleOffset: 441000,
+        position: 10000,
+        label: 'test_end'
+      }
+    ]);
   });
 
 });

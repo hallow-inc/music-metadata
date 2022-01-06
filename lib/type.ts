@@ -2,8 +2,9 @@ import { Buffer } from 'node:buffer';
 
 import { GenericTagId, TagType } from './common/GenericTagTypes.js';
 import { IFooter } from './apev2/APEv2Token.js';
-import { TrackType } from './matroska/types.js';
+import { IPoint } from "./wav/WaveChunk";
 
+import { TrackType } from './matroska/types.js';
 export { TrackType } from './matroska/types.js';
 
 /**
@@ -562,7 +563,7 @@ export interface IAudioMetadata extends INativeAudioMetadata {
    * Metadata, form independent interface
    */
   common: ICommonTagsResult;
-
+  cues?: IPoint[];
 }
 
 /**
